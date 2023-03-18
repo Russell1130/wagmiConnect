@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
+import { Web3Modal } from '@web3modal/react'
+import { configureChains, createClient, WagmiConfig } from 'wagmi'
+import { arbitrum, mainnet, polygon } from 'wagmi/chains'
+
+import { Web3Button } from '@web3modal/react'
+
+const chains = [arbitrum, mainnet, polygon]
+const projectId = 'fe62b424c4ab666f47d64744e0b3dca0'
+
+const { provider } = configureChains(chains, [w3mProvider({ projectId })])
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors: w3mConnectors({ projectId, version: 1, chains }),
+  provider
+})
+const ethereumClient = new EthereumClient(wagmiClient, chains)
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <WagmiConfig client={wagmiClient}>
+        <Web3Button accentColor="blueviolet"/>
+      </WagmiConfig>
+      <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
+    </>
+  )
 }
 
-export default App;
+export  default App;
